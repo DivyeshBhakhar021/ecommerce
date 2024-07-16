@@ -24,7 +24,30 @@ const addsalespeople = async (sname,city,comm) => {
     }
 }
 
+const deleteSalespeople = async (snum) => {
+    try {
+        const [result] = await pool.execute("DELETE FROM salespeople WHERE snum=?", [snum])
+        console.log(result);
+        return result;
+    } catch (error) {
+        console.log(error);
+        throw new Error("Error in delete salespeople.", error)
+    }
+}
+const updateSalespeole = async (sname, city, comm, snum) => {
+    try {
+        const [result] = await pool.execute("UPDATE salespeople SET sname=?, city=?, comm=? WHERE snum=?", [sname, city, comm, snum])
+        console.log(result);
+        return result;
+    } catch (error) {
+        console.log(error);
+        throw new Error("Error in update salespeople.", error)
+    }
+}
+
 module.exports = {
     getsalespeople,
-    addsalespeople
+    addsalespeople,
+    deleteSalespeople,
+    updateSalespeole
 };

@@ -13,4 +13,13 @@ router.post(
     salespeoplectontroller.adddatasalespeople
 )
 
+router.delete(
+    '/delete-salespeople/:snum',
+    salespeoplectontroller.deleteSalespeople
+)
+
+router.put(
+    '/update-salespeople/:snum',
+    salespeoplectontroller.updateSalespeople
+)
 module.exports = router
