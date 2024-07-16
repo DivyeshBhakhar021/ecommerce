@@ -8,5 +8,9 @@ router.get(
     salespeoplectontroller.listsalespeople
 )
 
+router.post(
+    "/add-salespeople",
+    salespeoplectontroller.adddatasalespeople
+)
 
 module.exports = router
