@@ -69,7 +69,7 @@ const updateSalespeople = async (req, res) => {
   try {
     const { snum } = req.params;
     const { sname, city, comm } = req.body;
-    const salespeople = await Salespeople.updateSalespeole(sname, city, comm, snum);
+    const salespeople = await Salespeople.updateSalespeole(sname, city, comm, parseInt(snum));
     // console.log(salespeople);
 
     res.status(200).json({

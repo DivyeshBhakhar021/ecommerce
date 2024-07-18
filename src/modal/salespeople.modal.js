@@ -38,7 +38,7 @@ const updateSalespeole = async (sname, city, comm, snum) => {
     try {
         const [result] = await pool.execute("UPDATE salespeople SET sname=?, city=?, comm=? WHERE snum=?", [sname, city, comm, snum])
         console.log(result);
-        return result;
+        return {sname, city, comm, snum};
     } catch (error) {
         console.log(error);
         throw new Error("Error in update salespeople.", error)

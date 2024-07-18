@@ -22,4 +22,6 @@ router.put(
     '/update-salespeople/:snum',
     salespeoplectontroller.updateSalespeople
 )
+
+
 module.exports = router
