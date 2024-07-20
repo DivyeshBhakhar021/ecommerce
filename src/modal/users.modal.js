@@ -18,6 +18,12 @@ const usersSchema = new mongoose.Schema(
             type: String,
             required: true
         },
+        refretoken :{
+            type: String
+        },
+        accrestoken :{
+            type: String
+        },
         role: {
             type: String,
             required: true
