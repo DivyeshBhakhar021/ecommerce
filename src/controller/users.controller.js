@@ -68,15 +68,12 @@ const userpost = async (req, res) => {
     }
 }
 
-
-
 const generateAuthToken = async (id) => {
     console.log("generateAuthToken", id);
     try {
 
         const user = await Users.findById(id);
 
-        console.log("sssuser", user);
 
         const accrestoken = jwt.sign({
             _id: user._id,
@@ -133,9 +130,79 @@ const login = async (req, res) => {
         const { accrestoken, refretoken } = await generateAuthToken(user._id);
         console.log("accrestoken!!!!!!!!!!!1", accrestoken);
         console.log("refretoken!!!!!!!!!!!!", refretoken);
+
+        const newdataf = await Users.findById({ _id: user._id }).select("-password -refretoken");
+
+        const option = {
+            httpOnly: true,
+            secure: true,
+        }
+
+
+        res.status(200)
+            .cookie("accrestoken", accrestoken, option)
+            .cookie("refretoken", refretoken, option)
+            .json({
+                success: true,
+                message: "login successfully",
+                data: { ...newdataf.toObject(), accrestoken }
+            })
+
+
+
     } catch (error) {
         console.log(error);
     }
 }
 
-module.exports = { userpost, login }
+const getnewtoken = async (req, res) => {
+    try {
+        
+        const cheackToken = await jwt.verify(req.cookies.refretoken, "123abc")
+
+        console.log("cheackToken", cheackToken);
+
+        if (!cheackToken) {
+            return res.status(400).json({
+                success: false,
+                message: "Token Expired"
+            })
+        }
+
+        const user = await Users.findById(cheackToken._id)
+
+        console.log("userssssssssssssssss", user);
+
+        if (!user) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid Token"
+            })
+        }
+
+        const { accrestoken, refretoken } = await generateAuthToken(user._id);
+
+        console.log({ "accessToken, refreshtoken": accrestoken, refretoken });
+
+
+        const option = {
+            httpOnly: true,
+            secure: true,
+        }
+
+
+        res.status(200)
+            .cookie("accrestoken", accrestoken, option)
+            .cookie("refretoken", refretoken, option)
+            .json({
+                success: true,
+                message: "ganret new token",
+                data: { accrestoken }
+            })
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+module.exports = { userpost, login, getnewtoken }

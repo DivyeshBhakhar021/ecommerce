@@ -4,6 +4,7 @@
     "axios": "^1.7.2",
     "bcrypt": "^5.0.1",
     "cloudinary": "^2.2.0",
+    "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "course": "^0.0.1",
     "express": "^4.19.2",

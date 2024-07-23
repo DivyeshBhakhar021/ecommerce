@@ -9,11 +9,17 @@ router.post(
 
 )
 
-
 router.post(
     "/login",
     usersdata.login
 
 )
+
+router.post(
+    "/get-newtoken",
+    usersdata.getnewtoken
+
+)
+
 
 module.exports = router
