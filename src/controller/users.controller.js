@@ -69,19 +69,17 @@ const userpost = async (req, res) => {
 }
 
 const generateAuthToken = async (id) => {
-    console.log("generateAuthToken", id);
+    console.log("generateAuthToken_id", id);
     try {
 
         const user = await Users.findById(id);
 
-
-        const accrestoken = jwt.sign({
+        const accrestoken =await jwt.sign({
             _id: user._id,
-            role: user.role
+            role: user.role     
         }, "abc123",
             { expiresIn: 60 * 60 });
 
-        console.log("accrestoken::::::::", accrestoken);
 
         const refretoken = await jwt.sign({
             _id: id
@@ -89,7 +87,6 @@ const generateAuthToken = async (id) => {
             "123abc",
             { expiresIn: "2d" });
 
-        console.log("refretokenrefretoken", refretoken);
 
         user.refretoken = refretoken
 
@@ -128,8 +125,6 @@ const login = async (req, res) => {
         }
 
         const { accrestoken, refretoken } = await generateAuthToken(user._id);
-        console.log("accrestoken!!!!!!!!!!!1", accrestoken);
-        console.log("refretoken!!!!!!!!!!!!", refretoken);
 
         const newdataf = await Users.findById({ _id: user._id }).select("-password -refretoken");
 
@@ -157,7 +152,7 @@ const login = async (req, res) => {
 
 const getnewtoken = async (req, res) => {
     try {
-        
+
         const cheackToken = await jwt.verify(req.cookies.refretoken, "123abc")
 
         console.log("cheackToken", cheackToken);
@@ -180,9 +175,14 @@ const getnewtoken = async (req, res) => {
             })
         }
 
-        const { accrestoken, refretoken } = await generateAuthToken(user._id);
+        if (req.cookies.refretoken != user.refretoken) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid Refresh Token"
+            })
+        }
 
-        console.log({ "accessToken, refreshtoken": accrestoken, refretoken });
+        const { accrestoken, refretoken } = await generateAuthToken(user._id);
 
 
         const option = {
@@ -196,7 +196,7 @@ const getnewtoken = async (req, res) => {
             .cookie("refretoken", refretoken, option)
             .json({
                 success: true,
-                message: "ganret new token",
+                message: "new token",
                 data: { accrestoken }
             })
 

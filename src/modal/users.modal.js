@@ -23,7 +23,7 @@ const usersSchema = new mongoose.Schema(
         },
         accrestoken :{
             type: String
-        },
+        }, 
         role: {
             type: String,
             required: true

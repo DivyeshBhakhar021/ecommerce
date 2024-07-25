@@ -2,6 +2,7 @@ const Categories = require("../modal/categories.modal");
 const SubCategories = require("../modal/subcategories.modal");
 
 const listCategories = async (req, res) => {
+  console.log("list",req.user);
   try {
     const categeryis = await Categories.find();
 
