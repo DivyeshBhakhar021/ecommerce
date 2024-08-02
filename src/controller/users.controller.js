@@ -1,5 +1,6 @@
 const Users = require("../modal/users.modal");
 const bcrypt = require('bcrypt');
+var jwt = require('jsonwebtoken');
 
 const userpost = async (req, res) => {
     try {
@@ -67,5 +68,141 @@ const userpost = async (req, res) => {
     }
 }
 
+const generateAuthToken = async (id) => {
+    console.log("generateAuthToken", id);
+    try {
 
-module.exports = { userpost }
+        const user = await Users.findById(id);
+
+
+        const accrestoken = jwt.sign({
+            _id: user._id,
+            role: user.role
+        }, "abc123",
+            { expiresIn: 60 * 60 });
+
+        console.log("accrestoken::::::::", accrestoken);
+
+        const refretoken = await jwt.sign({
+            _id: id
+        },
+            "123abc",
+            { expiresIn: "2d" });
+
+        console.log("refretokenrefretoken", refretoken);
+
+        user.refretoken = refretoken
+
+        await user.save({ validateBeforeSave: false });
+
+        return { accrestoken, refretoken }
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+const login = async (req, res) => {
+    try {
+        console.log(req.body);
+        const { email, password } = req.body;
+
+        const user = await Users.findOne({ $or: [{ email }] });
+
+        console.log("userlogin", user);
+
+        if (!user) {
+            return res.status(400).json({
+                success: false,
+                message: "user not found"
+            })
+        }
+
+        const ValidtUser = await bcrypt.compare(password, user.password);
+        console.log("userValidtUser", ValidtUser);
+
+        if (!ValidtUser) {
+            return res.status(400).json({
+                success: false,
+                message: "password not match"
+            })
+        }
+
+        const { accrestoken, refretoken } = await generateAuthToken(user._id);
+        console.log("accrestoken!!!!!!!!!!!1", accrestoken);
+        console.log("refretoken!!!!!!!!!!!!", refretoken);
+
+        const newdataf = await Users.findById({ _id: user._id }).select("-password -refretoken");
+
+        const option = {
+            httpOnly: true,
+            secure: true,
+        }
+
+
+        res.status(200)
+            .cookie("accrestoken", accrestoken, option)
+            .cookie("refretoken", refretoken, option)
+            .json({
+                success: true,
+                message: "login successfully",
+                data: { ...newdataf.toObject(), accrestoken }
+            })
+
+
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+const getnewtoken = async (req, res) => {
+    try {
+        
+        const cheackToken = await jwt.verify(req.cookies.refretoken, "123abc")
+
+        console.log("cheackToken", cheackToken);
+
+        if (!cheackToken) {
+            return res.status(400).json({
+                success: false,
+                message: "Token Expired"
+            })
+        }
+
+        const user = await Users.findById(cheackToken._id)
+
+        console.log("userssssssssssssssss", user);
+
+        if (!user) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid Token"
+            })
+        }
+
+        const { accrestoken, refretoken } = await generateAuthToken(user._id);
+
+        console.log({ "accessToken, refreshtoken": accrestoken, refretoken });
+
+
+        const option = {
+            httpOnly: true,
+            secure: true,
+        }
+
+
+        res.status(200)
+            .cookie("accrestoken", accrestoken, option)
+            .cookie("refretoken", refretoken, option)
+            .json({
+                success: true,
+                message: "ganret new token",
+                data: { accrestoken }
+            })
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+module.exports = { userpost, login, getnewtoken }

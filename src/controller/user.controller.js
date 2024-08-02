@@ -1,0 +1,214 @@
+const Users = require("../modal/users.modal");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const sendMail = require("../utilse/nodemailer");
+
+const genrentAccRefToken = async (id) => {
+  try {
+    const user = await Users.findById(id);
+    const accrestoken = jwt.sign(
+      {
+        _id: user._id,
+        role: user.role,
+      },
+      "Qwerty123",
+      { expiresIn: 60 * 60 }
+    );
+
+    const refretoken = jwt.sign({ _id: user._id }, "Qwerty12345", {
+      expiresIn: "2d",
+    });
+
+    user.refretoken = refretoken;
+    await user.save({ validateBeforeSave: false });
+    return { accrestoken, refretoken };
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+const register = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const verifyEmail = await Users.findOne({ email });
+
+
+
+    if (verifyEmail) {
+      return res.status(409).json({
+        success: false,
+        message: "Email already exists.",
+      });
+    }
+
+    const hashPass = await bcrypt.hash(password, 10);
+
+    const user = await Users.create({
+      ...req.body,
+      password: hashPass,
+    });
+
+    if (!user) {
+      return res.status(500).json({
+        success: false,
+        message: "User not created.",
+      });
+    }
+
+    const userdataF = await Users.findById(user._id).select("-password");
+
+    sendMail(req.body)
+
+    return res.status(201).json({
+      success: true,
+      message: "Registration successful.",
+      data: userdataF,
+    });
+
+    
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Internal server error: " + error.message,
+    });
+  }
+};
+
+const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const user = await Users.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found.",
+      });
+    }
+
+    const verifyPassword = await bcrypt.compare(password, user.password);
+    if (!verifyPassword) {
+      return res.status(404).json({
+        success: false,
+        message: "Password is incorrect.",
+      });
+    }
+
+    const { accrestoken, refretoken } = await genrentAccRefToken(user._id);
+
+    const userdataF = await Users.findById(user._id).select(
+      "-password -refretoken"
+    );
+
+    const option = {
+      httpOnly: true,
+      secure: true,
+    };
+
+    res
+      .status(200)
+      .cookie("accrestoken", accrestoken, option)
+      .cookie("refretoken", refretoken, option)
+      .json({
+        success: true,
+        message: "Successfully logged in.",
+        data: { ...userdataF.toObject(), accrestoken: accrestoken },
+      });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Internal server error: " + error.message,
+    });
+  }
+};
+
+const generateNewToken = async (req, res) => {
+  try {
+    const checkToken = jwt.verify(req.cookies.refretoken, "Qwerty12345");
+
+    console.log(checkToken);
+
+    if (!checkToken) {
+      return res.status(400).json({
+        success: false,
+        message: "Token expired.",
+      });
+    }
+
+    const user = await Users.findById(checkToken._id);
+
+    console.log(user);
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid token.",
+      });
+    }
+
+    if (req.cookies.refretoken !== user.refretoken) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid refresh token.",
+      });
+    }
+
+    const { accrestoken, refretoken } = await genrentAccRefToken(user._id);
+    const option = {
+      httpOnly: true,
+      secure: true,
+    };
+
+    res
+      .status(200)
+      .cookie("accrestoken", accrestoken, option)
+      .cookie("refretoken", refretoken, option)
+      .json({
+        success: true,
+        message: "New token generated.",
+        data: { accrestoken: accrestoken },
+      });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Internal server error: " + error.message,
+    });
+  }
+};
+
+const logout = async (req, res) => {
+  try {
+    const user = await Users.findByIdAndUpdate(req.body._id, {
+      $unset: { refretoken: 1 },
+    }, { new: true });
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "User not logged out.",
+      });
+    }
+
+    res
+      .status(200)
+      .clearCookie("accrestoken")
+      .clearCookie("refretoken")
+      .json({
+        success: true,
+        message: "User logged out successfully.",
+      });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Internal server error: " + error.message,
+    });
+  }
+};
+
+module.exports = {
+  register,
+  login,
+  generateNewToken,
+  logout,
+};
