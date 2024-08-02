@@ -1,6 +1,3 @@
-
-
-
 const passport = require('passport');
 const Users = require('../modal/users.modal');
 
