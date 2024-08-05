@@ -1,12 +1,13 @@
 {
   "dependencies": {
     "@reduxjs/toolkit": "^2.2.5",
-    "axios": "^1.7.2",
+    "axios": "^1.7.3",
     "bcrypt": "^5.0.1",
     "cloudinary": "^2.2.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "course": "^0.0.1",
+    "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "express-session": "^1.18.0",
     "jsonwebtoken": "^9.0.2",
@@ -20,7 +21,8 @@
     "passport-facebook": "^3.0.0",
     "passport-google-oauth20": "^2.0.0",
     "pdfmake": "^0.2.10",
-    "socket.io": "^4.7.5"
+    "socket.io": "^4.7.5",
+    "twilio": "^5.2.2"
   },
   "name": "ecommerce",
   "version": "1.0.0",

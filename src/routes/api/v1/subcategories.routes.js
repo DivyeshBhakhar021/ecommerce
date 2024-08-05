@@ -1,10 +1,12 @@
 const express = require("express");
 const { subcategoriesController } = require("../../../controller");
+const { verifiy } = require("../../../utilse/twilio");
 
 const router = express.Router();
 
 router.get(
     "/list-subcategories",
+    verifiy,
     subcategoriesController.listSubcategories
 )   
 
