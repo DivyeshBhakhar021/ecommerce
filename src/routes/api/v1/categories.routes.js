@@ -1,6 +1,8 @@
 const express = require("express");
 const { categoriesController } = require("../../../controller");
 const { twilioSms } = require("../../../utilse/twilio");
+const validate = require("../../../middleware/validate");
+const { categotyValidtion } = require("../../../validation");
 
 const router = express.Router();
 
@@ -11,6 +13,7 @@ router.get(
 )
 
 router.post("/addcategories",
+    validate(categotyValidtion.createcatrgory),
     categoriesController.addCategories
  )
 

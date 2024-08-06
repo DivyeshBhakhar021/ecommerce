@@ -4,8 +4,11 @@ const dotenv = require('dotenv');
 
 
 
-const twilioSms =  async (req,res,next) => {
+const twilioSms = async (req, res, next) => {
   try {
+
+
+
     // id auton
     const client = require('twilio')(accountSid, authToken);
 
@@ -26,13 +29,16 @@ const twilioSms =  async (req,res,next) => {
   }
 }
 
-const verifiy = async (req,res,next) =>{
-  console.log("a",req.session.otp);
+const verifiy = async (req, res, next) => {
+  console.log("a", req.session.otp);
   try {
     const session_otp = req.session.otp;
     const otp = req.body;
 
-    if(!session_otp == otp){
+    console.log(otp);
+    
+
+    if (!session_otp == otp) {
       res.status(404).json({
         success: false,
         message: "wrong otp"
@@ -48,11 +54,11 @@ const verifiy = async (req,res,next) =>{
 
   } catch (error) {
     console.log(error);
-    
+
   }
-  
+
 
 }
 
 
-module.exports = {twilioSms,verifiy} 
+module.exports = { twilioSms, verifiy } 
