@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.get(
     "/list-subcategories",
-    verifiy,
+    // verifiy,
     subcategoriesController.listSubcategories
 )   
 

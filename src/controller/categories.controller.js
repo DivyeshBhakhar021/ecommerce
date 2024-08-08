@@ -1,24 +1,43 @@
 const Categories = require("../modal/categories.modal");
 const SubCategories = require("../modal/subcategories.modal");
-const twilioSms = require("../utilse/twilio");
+
 
 const listCategories = async (req, res) => {
-
+  console.log(req.query.page, req.query.pageSize);
+  
   try {
     const categeryis = await Categories.find();
+
+    let page = parseInt(req.query.page)
+    let pageSize = parseInt(req.query.pageSize)
+
+    if (page <= 0 && pageSize <= 0) {
+      res.status(400).json({
+        success: false,
+        message: "page or pageSize is must be less than more zero",
+      });
+    }
 
     if (!categeryis || categeryis.length === 0) {
       res.status(404).json({
         success: false,
         message: "categories not found"
       });
+    }
 
+    let startIndex=[0], endIndex=[0],paginationData=[0]
+
+    if (page > 0 && pageSize > 0) {
+      startIndex = (page-1)*pageSize
+      endIndex = page+pageSize
+      paginationData = categeryis.slice(startIndex, endIndex)
     }
 
     res.status(200).json({
       success: true,
       message: "categories found",
-      data: categeryis
+      totalData: categeryis.length,
+      data: paginationData
     });
 
   } catch (error) {

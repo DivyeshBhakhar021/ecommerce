@@ -8,7 +8,8 @@ const router = express.Router();
 
 router.get(
     "/list-categories",
-    twilioSms,
+    // validate(categotyValidtion.getCategory),
+    // twilioSms,
     categoriesController.listCategories
 )
 
@@ -17,12 +18,13 @@ router.post("/addcategories",
     categoriesController.addCategories
  )
 
-router.put(
-    "/updateCategories/:category_id",
+router.put("/updateCategories/:category_id",
+    validate(categotyValidtion.updateCategory),
     categoriesController.updateCategories
 )
 
-router.delete("/deleteCategories/:category_id", 
+router.delete("/deleteCategories/:category_id",
+    validate(categotyValidtion.deleteCategory),
     categoriesController.deleteCategories
 )
 
