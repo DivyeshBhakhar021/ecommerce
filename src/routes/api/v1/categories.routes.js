@@ -36,6 +36,8 @@ router.get("/countActiveCategories",
     categoriesController.countActiveCategories
 )
 
+
+
 router.get("/count-active", categoriesController.countActiveCategory);
 
 router.get("/most-products", categoriesController.mostProductCat);

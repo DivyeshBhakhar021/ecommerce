@@ -29,4 +29,8 @@ router.get("/getProductscategories",
     productCproductontroller.getProductscategories
 )
 
+router.get("/serachproduct",
+    productCproductontroller.serachproduct
+)
+
 module.exports = router

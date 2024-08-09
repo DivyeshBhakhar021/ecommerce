@@ -10,8 +10,8 @@ const googleProvuder = async () => {
 
     try {
         await passport.use(new GoogleStrategy({
-            clientID: "",
-            clientSecret: "",
+            clientID:process.env.GOOGLE_ClIENTID,
+            clientSecret: process.env.GOOGKE_ClIENTSECRET,
             callbackURL: "http://localhost:5000/api/v1/users/google/callback"
         },
             async function (accessToken, refreshToken, profile, cb) {
@@ -69,8 +69,8 @@ const facebookProvider = async () => {
 
     try {
         passport.use(new FacebookStrategy({
-            clientID:"",
-            clientSecret: "",
+            clientID:process.env.FACEBOOK_ClIENTID,
+            clientSecret: process.env.FACEBOOK_ClIENTSECRET,
             callbackURL: "http://localhost:5000/api/v1/users/facebook/callback",
             enableProof: true,
             profileFields: ['id', 'displayName', 'photos']

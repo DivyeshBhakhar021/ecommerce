@@ -25,11 +25,11 @@ const listCategories = async (req, res) => {
       });
     }
 
-    let startIndex=[0], endIndex=[0],paginationData=[0]
+    let startIndex=[], endIndex=[],paginationData=[]
 
     if (page > 0 && pageSize > 0) {
       startIndex = (page-1)*pageSize
-      endIndex = page+pageSize
+      endIndex = page * pageSize
       paginationData = categeryis.slice(startIndex, endIndex)
     }
 
@@ -39,6 +39,7 @@ const listCategories = async (req, res) => {
       totalData: categeryis.length,
       data: paginationData
     });
+    
 
   } catch (error) {
     res.status(500).json({
@@ -360,5 +361,76 @@ const inActiveCategory = async (req, res) => {
     });
   }
 };
+
+const serachproduct = async (req,res) =>{
+  try {
+      const { category_id, priceRange, rating, skip, limit } = req.body;
+      const products = await Products.aggregate([
+          {
+            $lookup: {
+              from: "variants",
+              localField: "_id",
+              foreignField: "product_id",
+              as: "variants"
+            }
+          },
+          {
+            $lookup: {
+              from: "reviews",
+              localField: "_id",
+              foreignField: "product_id",
+              as: "reviews"
+            }
+          },
+          {
+            $addFields: {
+              avgRating: { $avg: "$reviews.rating" }
+            }
+          },
+          {
+            $unwind: "$variants"
+          },
+          {
+            $match: {
+              avgRating: { $gte: 4 },
+              category_id: 1,
+              "variants.attributes.Price": { $gte: 0, $lte: 10000 }
+            }
+          },
+          {
+            $group: {
+              _id: "$_id",
+              name: { $first: "$name" },
+              variants: { $push: "$variants" },
+              reviews: { $push: "$reviews" }
+            }
+          },
+          {
+            $sort: {
+              name: 1
+            }
+          },
+          {
+            $skip: 0
+          },
+          {
+            $limit: 10
+          }
+        ])
+
+        res.status(200).json({
+          success: true,
+          message: "Products retrieved successfully",
+          data: products
+      });
+  } catch (error) {
+       res.status(500).json({
+          success: false,
+          message: "Internal server error: " + error.message
+      });
+  
+  }
+} 
+
 
 module.exports = { listCategories, addCategories, updateCategories, deleteCategories ,countsubcategories,countActiveCategories,countActiveCategory,mostProductCat,totalProduct,countSubcategory,inActiveCategory}
