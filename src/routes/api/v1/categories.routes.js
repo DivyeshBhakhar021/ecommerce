@@ -3,12 +3,19 @@ const { categoriesController } = require("../../../controller");
 const { twilioSms } = require("../../../utilse/twilio");
 const validate = require("../../../middleware/validate");
 const { categotyValidtion } = require("../../../validation");
+const auth = require("../../../middleware/auth");
 
 const router = express.Router();
 
+router.get (
+    "/get-categorie",
+    validate(categotyValidtion.getCategory),
+    categoriesController.getCategory
+)
+
 router.get(
     "/list-categories",
-    // validate(categotyValidtion.getCategory),
+    auth(["admin","ajay"]),
     // twilioSms,
     categoriesController.listCategories
 )

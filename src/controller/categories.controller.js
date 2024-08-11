@@ -49,6 +49,33 @@ const listCategories = async (req, res) => {
   }
 }
 
+const getCategory = async (req, res) => {
+  try {
+    const categories = await Categories.find({categoryId: req.params.categoryId});
+    console.log("categories",categories);
+
+
+
+      if (!categories || categories.length === 0) {
+          res.status(404).json({
+              success: false,
+              message: "categories not found"
+          });
+      }
+
+      res.status(200).json({
+          success: true,
+          message: "categories found",
+          data: categories
+      });
+  } catch (error) {
+      res.status(500).json({
+          success: false,
+          message: "Internal server error" + error.message
+      });
+  }
+}
+
 const addCategories = async (req, res) => {
   try {
     console.log(req.body);
@@ -433,4 +460,4 @@ const serachproduct = async (req,res) =>{
 } 
 
 
-module.exports = { listCategories, addCategories, updateCategories, deleteCategories ,countsubcategories,countActiveCategories,countActiveCategory,mostProductCat,totalProduct,countSubcategory,inActiveCategory}
+module.exports = {getCategory,serachproduct, listCategories, addCategories, updateCategories, deleteCategories ,countsubcategories,countActiveCategories,countActiveCategory,mostProductCat,totalProduct,countSubcategory,inActiveCategory}

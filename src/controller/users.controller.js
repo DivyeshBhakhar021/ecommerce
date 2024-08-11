@@ -2,207 +2,212 @@ const Users = require("../modal/users.modal");
 const bcrypt = require('bcrypt');
 var jwt = require('jsonwebtoken');
 
-const userpost = async (req, res) => {
+const genrentAccRefToken = async (id) => {
     try {
-        console.log(req.body);
-
-        const { email, password } = req.body;
-
-        const user = await Users.findOne(
-            { $or: [{ email }] }
-        );
-
-        console.log("user", user);
-
-        if (user) {
-            return res.status(400).json({
-                success: false,
-                message: "User already exists",
-            });
-        }
-
-        const hashpassoword = await bcrypt.hash(password, 10);
-
-        console.log("hashpassoword", hashpassoword);
-
-        if (!hashpassoword) {
-            return res.status(409).json({
-                success: false,
-                message: "password is valid while hasing error.",
-            });
-        }
-
-        const newdata = await Users.create({ ...req.body, password: hashpassoword })
-
-        console.log("newdata", newdata);
-
-        if (!newdata) {
-            return res.status(500).json({
-                success: false,
-                message: "internal server erorr.",
-            });
-        }
-
-        const newdataf = await Users.findById({ _id: newdata._id }).select("-password");
-
-        console.log("newdataf", newdataf);
-
-        if (!newdataf) {
-            return res.status(500).json({
-                success: false,
-                message: "internal server erorr.",
-            });
-        }
-        res.status(201).json({
-            success: true,
-            message: "user created successfully.",
-            data: newdataf
-        });
-
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({
-            success: false,
-            message: "Internal server error.",
-        });
-    }
-}
-
-const generateAuthToken = async (id) => {
-    console.log("generateAuthToken", id);
-    try {
-
-        const user = await Users.findById(id);
-
-
-        const accrestoken = jwt.sign({
-            _id: user._id,
-            role: user.role
-        }, "abc123",
-            { expiresIn: 60 * 60 });
-
-        console.log("accrestoken::::::::", accrestoken);
-
-        const refretoken = await jwt.sign({
-            _id: id
+      const user = await Users.findById(id);
+      const accrestoken = jwt.sign(
+        {
+          _id: user._id,
+          role: user.role,
         },
-            "123abc",
-            { expiresIn: "2d" });
-
-        console.log("refretokenrefretoken", refretoken);
-
-        user.refretoken = refretoken
-
-        await user.save({ validateBeforeSave: false });
-
-        return { accrestoken, refretoken }
+        "Qwerty123",
+        { expiresIn: 60 * 60 }
+      );
+  
+      const refretoken = jwt.sign({ _id: user._id }, "Qwerty12345", {
+        expiresIn: "2d",
+      });
+  
+      user.refretoken = refretoken;
+      await user.save({ validateBeforeSave: false });
+      return { accrestoken, refretoken };
     } catch (error) {
-        console.log(error);
+      throw new Error(error);
     }
-}
-
-const login = async (req, res) => {
+  };
+  
+  const register = async (req, res) => {
     try {
-        console.log(req.body);
-        const { email, password } = req.body;
-
-        const user = await Users.findOne({ $or: [{ email }] });
-
-        console.log("userlogin", user);
-
-        if (!user) {
-            return res.status(400).json({
-                success: false,
-                message: "user not found"
-            })
-        }
-
-        const ValidtUser = await bcrypt.compare(password, user.password);
-        console.log("userValidtUser", ValidtUser);
-
-        if (!ValidtUser) {
-            return res.status(400).json({
-                success: false,
-                message: "password not match"
-            })
-        }
-
-        const { accrestoken, refretoken } = await generateAuthToken(user._id);
-        console.log("accrestoken!!!!!!!!!!!1", accrestoken);
-        console.log("refretoken!!!!!!!!!!!!", refretoken);
-
-        const newdataf = await Users.findById({ _id: user._id }).select("-password -refretoken");
-
-        const option = {
-            httpOnly: true,
-            secure: true,
-        }
-
-
-        res.status(200)
-            .cookie("accrestoken", accrestoken, option)
-            .cookie("refretoken", refretoken, option)
-            .json({
-                success: true,
-                message: "login successfully",
-                data: { ...newdataf.toObject(), accrestoken }
-            })
-
-
-
+      console.log(req.file);
+      
+      const { email, password } = req.body;
+      const verifyEmail = await Users.findOne({ email });
+  
+  
+  
+      if (verifyEmail) {
+        return res.status(409).json({
+          success: false,
+          message: "Email already exists.",
+        });
+      }
+  
+      const hashPass = await bcrypt.hash(password, 10);
+  
+      const user = await Users.create({
+        ...req.body,
+        password: hashPass,
+        avtar: req.file.path,
+      });
+  
+      if (!user) {
+        return res.status(500).json({
+          success: false,
+          message: "User not created.",
+        });
+      }
+  
+      const userdataF = await Users.findById(user._id).select("-password");
+  
+      // sendMail(req.body)
+  
+      return res.status(201).json({
+        success: true,
+        message: "Registration successful.",
+        data: userdataF,
+      });
+  
+      
     } catch (error) {
-        console.log(error);
+      res.status(500).json({
+        success: false,
+        message: "Internal server error: " + error.message,
+      });
     }
-}
-
-const getnewtoken = async (req, res) => {
+  };
+  
+  const login = async (req, res) => {
     try {
-        
-        const cheackToken = await jwt.verify(req.cookies.refretoken, "123abc")
-
-        console.log("cheackToken", cheackToken);
-
-        if (!cheackToken) {
-            return res.status(400).json({
-                success: false,
-                message: "Token Expired"
-            })
-        }
-
-        const user = await Users.findById(cheackToken._id)
-
-        console.log("userssssssssssssssss", user);
-
-        if (!user) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid Token"
-            })
-        }
-
-        const { accrestoken, refretoken } = await generateAuthToken(user._id);
-
-        console.log({ "accessToken, refreshtoken": accrestoken, refretoken });
-
-
-        const option = {
-            httpOnly: true,
-            secure: true,
-        }
-
-
-        res.status(200)
-            .cookie("accrestoken", accrestoken, option)
-            .cookie("refretoken", refretoken, option)
-            .json({
-                success: true,
-                message: "ganret new token",
-                data: { accrestoken }
-            })
-
+      const { email, password } = req.body;
+  
+      const user = await Users.findOne({ email });
+  
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: "User not found.",
+        });
+      }
+  
+      const verifyPassword = await bcrypt.compare(password, user.password);
+      if (!verifyPassword) {
+        return res.status(404).json({
+          success: false,
+          message: "Password is incorrect.",
+        });
+      }
+  
+      const { accrestoken, refretoken } = await genrentAccRefToken(user._id);
+      console.log("accrestoken!!!!!!!!!!!1", accrestoken);
+      console.log("refretoken!!!!!!!!!!!!", refretoken);
+  
+      const userdataF = await Users.findById(user._id).select(
+        "-password -refretoken"
+      );
+  
+      const option = {
+        httpOnly: true,
+        secure: true,
+      };
+  
+      res
+        .status(200)
+        .cookie("accrestoken", accrestoken, option)
+        .cookie("refretoken", refretoken, option)
+        .json({
+          success: true,
+          message: "Successfully logged in.",
+          data: { ...userdataF.toObject(), accrestoken: accrestoken },
+        });
     } catch (error) {
-        console.log(error);
+      res.status(500).json({
+        success: false,
+        message: "Internal server error: " + error.message,
+      });
     }
-}
+  };
+  
+  const generateNewToken = async (req, res) => {
+    try {
+      const checkToken = jwt.verify(req.cookies.refretoken, "Qwerty12345");
+  
+      console.log(checkToken);
+  
+      if (!checkToken) {
+        return res.status(400).json({
+          success: false,
+          message: "Token expired.",
+        });
+      }
+  
+      const user = await Users.findById(checkToken._id);
+  
+      console.log(user);
+  
+      if (!user) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid token.",
+        });
+      }
+  
+      if (req.cookies.refretoken !== user.refretoken) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid refresh token.",
+        });
+      }
+  
+      const { accrestoken, refretoken } = await genrentAccRefToken(user._id);
+      const option = {
+        httpOnly: true,
+        secure: true,
+      };
+  
+      res
+        .status(200)
+        .cookie("accrestoken", accrestoken, option)
+        .cookie("refretoken", refretoken, option)
+        .json({
+          success: true,
+          message: "New token generated.",
+          data: { accrestoken: accrestoken },
+        });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Internal server error: " + error.message,
+      });
+    }
+  };
+  
+  const logout = async (req, res) => {
+    try {
+      const user = await Users.findByIdAndUpdate(req.body._id, {
+        $unset: { refretoken: 1 },
+      }, { new: true });
+  
+      if (!user) {
+        return res.status(400).json({
+          success: false,
+          message: "User not logged out.",
+        });
+      }
+  
+      res
+        .status(200)
+        .clearCookie("accrestoken")
+        .clearCookie("refretoken")
+        .json({
+          success: true,
+          message: "User logged out successfully.",
+        });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Internal server error: " + error.message,
+      });
+    }
+  };
 
-module.exports = { userpost, login, getnewtoken }
+module.exports = { logout,register,genrentAccRefToken, login, generateNewToken }

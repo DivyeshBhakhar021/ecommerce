@@ -17,29 +17,29 @@ const transporter = nodemailer.createTransport({
 });
 
 const sendMail = async (to, subject, text, html) => {
-  try {
-    const info = await transporter.sendMail({
-      from: '"Your Name" <divyeshbhakhar021@gmail.com>',
-      to:"divyeshbhakhar021@gmail.com",
-      subject:"abc",
-      text:"helllo",
-      attachments: [
-        {
-            filename: 'Beets.jpeg',
-            path: path.join(__dirname,'../../public/assets/Beets.jpeg')
-        },
-        {
-                  filename: 'pdf',
-                  path: path.join(__dirname,'../../../../../divyesh/project/ecommerce/document.pdf')
+  // try {
+  //   const info = await transporter.sendMail({
+  //     from: '"Your Name" <divyeshbhakhar021@gmail.com>',
+  //     to:"divyeshbhakhar021@gmail.com",
+  //     subject:"abc",
+  //     text:"helllo",
+  //     attachments: [
+  //       {
+  //           filename: 'Beets.jpeg',
+  //           path: path.join(__dirname,'../../public/assets/Beets.jpeg')
+  //       },
+  //       {
+  //                 filename: 'pdf',
+  //                 path: path.join(__dirname,'../../../../../divyesh/project/ecommerce/document.pdf')
 
-        },
-        // exportpdfmake()
-    ]
-    });
-    console.log("Message sent: %s", info.messageId);
-  } catch (error) {
-    console.error("Error sending email: ", error);
-  }
+  //       },
+  //       // exportpdfmake()
+  //   ]
+  //   });
+  //   console.log("Message sent: %s", info.messageId);
+  // } catch (error) {
+  //   console.error("Error sending email: ", error);
+  // }
 };
 
 module.exports = sendMail;

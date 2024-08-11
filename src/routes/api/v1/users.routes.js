@@ -1,12 +1,13 @@
 const express = require("express");
-const userController = require("../../../controller/user.controller");
+const userController = require("../../../controller/users.controller");
 const passport = require("passport");
 const sendMail = require("../../../utilse/nodemailer");
 const exportpdfmake = require("../../../utilse/pdfcrate");
+const upload = require("../../../middleware/upload");
 
 const router = express.Router();
 
-router.post("/useradd", userController.register);
+router.post("/useradd", upload.single("avtar"), userController.register);
 router.post("/login", userController.login);
 router.post("/get-newtoken", userController.generateNewToken);
 router.post("/logout", userController.logout);

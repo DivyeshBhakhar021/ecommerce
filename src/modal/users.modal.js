@@ -18,6 +18,9 @@ const usersSchema = new mongoose.Schema(
             type: String,
             // required: true
         },
+        avtar: {
+            type: String
+        },
         refretoken :{
             type: String
         },
