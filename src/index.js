@@ -42,7 +42,7 @@ connectDB();
 // // connectChat()
 
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: 'https://fruitables-8g60pxijf-divyeshs-projects-bfee8bc9.vercel.app',
     credentials: true
 }))
 // app.use(require('express-session')({ secret: 'aaa$12', resave: true, saveUninitialized: true }));
