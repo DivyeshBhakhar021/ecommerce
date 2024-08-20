@@ -10,11 +10,11 @@ const genrentAccRefToken = async (id) => {
           _id: user._id,
           role: user.role,
         },
-        "Qwerty123",
+        process.env.ACCRESTOKEN_RES,
         { expiresIn: 60 * 60 }
       );
   
-      const refretoken = jwt.sign({ _id: user._id }, "Qwerty12345", {
+      const refretoken = jwt.sign({ _id: user._id }, process.env.REFRESTOKEN_RES, {
         expiresIn: "1d",
       });
 

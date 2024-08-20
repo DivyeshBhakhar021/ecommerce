@@ -1,8 +1,8 @@
 const cloudinary = require('cloudinary').v2;
 
 cloudinary.config({ 
-    cloud_name: "ddgtv4sih", 
-    api_key: "898435225257456", 
+    cloud_name: process.env.CLOUD_NAME,
+    api_key: process.env.CLOUD_KEY, 
     api_secret:  process.env.CLOUDINARYSECRET
 });
 

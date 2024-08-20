@@ -10,7 +10,7 @@ const pdfmake = require("./utilse/pdfcrate");
 const swaggerUi = require('swagger-ui-express');
 const YAML = require('yamljs');
 const cors = require('cors');
-const connectChat = require("./utilse/Socket");
+// const connectChat = require("./utilse/Socket");
 const path = require('path');
 
 const app = express();
@@ -39,7 +39,7 @@ app.use(
 
 // app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 connectDB();
-connectChat()
+// connectChat()
 
 app.use(cors({
     origin: 'http://localhost:3000',

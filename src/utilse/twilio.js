@@ -7,8 +7,6 @@ const dotenv = require('dotenv');
 const twilioSms = async (req, res, next) => {
   try {
 
-
-
     // id auton
     const client = require('twilio')(accountSid, authToken);
 
