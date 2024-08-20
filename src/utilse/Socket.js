@@ -14,7 +14,7 @@ const connectChat = () => {
     socket.broadcast.emit('hello', 'how are you') // one too all
 
     socket.on('hello', (data) => {
-      console.log(data);
+      // console.log(data);
       socket.to(data.receiver).emit('res-msg', data.massage)
     });
 

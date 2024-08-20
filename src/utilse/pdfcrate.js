@@ -15,7 +15,7 @@ const fonts = {
 const printer = new PdfPrinter(fonts);
 
 const exportpdfmake =  async (req,res)  => {
-    console.log(__dirname);
+    // console.log(__dirname);
     
     const imagePath = path.join(__dirname, '../../../../../divyesh/project/ecommerce/public/assets/Beets.jpeg');
     const docDefinition = {

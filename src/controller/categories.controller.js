@@ -3,7 +3,7 @@ const SubCategories = require("../modal/subcategories.modal");
 
 
 const listCategories = async (req, res) => {
-  console.log(req.query.page, req.query.pageSize);
+  // console.log(req.query.page, req.query.pageSize);
   
   try {
     const categeryis = await Categories.find();
@@ -78,7 +78,7 @@ const getCategory = async (req, res) => {
 
 const addCategories = async (req, res) => {
   try {
-    console.log(req.body);
+    // console.log(req.body);
 
     try {
       const newCategory = await Categories.create(req.body);
@@ -162,7 +162,7 @@ const deleteCategories = async (req, res) => {
 // /category/count-subcategories   //Retrieve the count of subcategories for each category.
 const countsubcategories = async (req, res) => {
   try {
-    console.log(req.body);
+    // console.log(req.body);
 
     const categories = await Categories.aggregate([
       {

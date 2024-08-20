@@ -6,8 +6,6 @@ var FacebookStrategy = require('passport-facebook').Strategy;
 
     
 const googleProvuder = async () => {
-
-
     try {
         await passport.use(new GoogleStrategy({
             clientID:process.env.GOOGLE_ClIENTID,
@@ -42,23 +40,19 @@ const googleProvuder = async () => {
 
         passport.serializeUser(function (user, done) {
             console.log("serializeUser", user);
-            done(null, user.id);
+            done(null, user);
         });
 
-        passport.deserializeUser(async function (_id, done) {
-            console.log("deserializeUser", _id);
+        passport.deserializeUser(async function (data, done) {
+            console.log("deserializeUser", data);
+
             try {
-
-                const user = await Users.findById(_id);
-
-                done(err, user);
-
+                done(null, data);
             } catch (error) {
-                console.log(error);
+                done(error,null);
             }
         });
-
-
+        
     } catch (error) {
         console.log(error);
     }

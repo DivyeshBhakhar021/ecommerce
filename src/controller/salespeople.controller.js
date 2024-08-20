@@ -29,7 +29,7 @@ const adddatasalespeople = async (req, res) => {
     const { sname, city, comm } = req.body;
 
     const salespeople = await Salespeople.addsalespeople(sname, city, comm);
-    console.log(salespeople);
+    // console.log(salespeople);
 
     res.status(201).json({
       success: false,
@@ -50,7 +50,7 @@ const deleteSalespeople = async (req, res) => {
   try {
     const { snum } = req.params;
     const salespeople = await Salespeople.deleteSalespeople(snum);
-    console.log(salespeople);
+    // console.log(salespeople);
 
     res.status(200).json({
       success: true,

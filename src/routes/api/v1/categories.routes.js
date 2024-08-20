@@ -15,7 +15,7 @@ router.get (
 
 router.get(
     "/list-categories",
-    auth(["admin","ajay"]),
+    auth(["admin","user"]),
     // twilioSms,
     categoriesController.listCategories
 )

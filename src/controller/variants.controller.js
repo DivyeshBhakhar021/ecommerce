@@ -4,9 +4,7 @@ const fileupload = require("../utilse/cloudinary");
 const listVariants = async (req, res) => {
     try {
         const variant = await Variants.find()
-        console.log(variant);
-
-
+  
         if (!variant || variant.length === 0) {
             res.status(404).json({
                 success: false,
@@ -93,8 +91,6 @@ const getVariant = async (req, res) => {
 // }
 
 const addVariant = async (req, res) => {
-    console.log("abc", req.files);
-    console.log("fdd", req.body);
     let allFiles = [];
     if (req.files) {
         await Promise.all(
@@ -104,8 +100,7 @@ const addVariant = async (req, res) => {
             })
         );
     }
-    console.log("req.file", req.files);
-    console.log("all  files", allFiles);
+
     const img = allFiles.map((file) => {
         return {
             public_id: file.public_id,
@@ -113,7 +108,6 @@ const addVariant = async (req, res) => {
         }
     })
 
-    console.log("qwert", img);
     try {
         const variant = await Variants.create({ ...req.body, variant_image: img });
         if (!variant) {
@@ -147,12 +141,10 @@ const updateVariant = async (req, res) => {
     }
 
     if (req.file) {
-        console.log("New image.");
 
         try {
             const fileRes = await fileupload(req.file.path, "Variant");
-            console.log(fileRes);
-
+      
             const updatedVariantData = {
                 ...req.body,
                 variant_image: {
@@ -183,11 +175,10 @@ const updateVariant = async (req, res) => {
             });
         }
     } else {
-        console.log("Old image.");
 
         try {
             const variant = await Variants.findByIdAndUpdate(variantId, req.body, { new: true, runValidators: true });
-            console.log(variant);
+            
 
             if (!variant) {
                 return res.status(400).json({

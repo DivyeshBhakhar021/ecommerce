@@ -15,8 +15,11 @@ const genrentAccRefToken = async (id) => {
       );
   
       const refretoken = jwt.sign({ _id: user._id }, "Qwerty12345", {
-        expiresIn: "2d",
+        expiresIn: "1d",
       });
+
+      
+      
   
       user.refretoken = refretoken;
       await user.save({ validateBeforeSave: false });
@@ -27,8 +30,9 @@ const genrentAccRefToken = async (id) => {
   };
   
   const register = async (req, res) => {
+    
     try {
-      console.log(req.file);
+      // console.log(req.file);
       
       const { email, password } = req.body;
       const verifyEmail = await Users.findOne({ email });
@@ -47,7 +51,7 @@ const genrentAccRefToken = async (id) => {
       const user = await Users.create({
         ...req.body,
         password: hashPass,
-        avtar: req.file.path,
+        // avtar: req.file.path,
       });
   
       if (!user) {
@@ -77,6 +81,8 @@ const genrentAccRefToken = async (id) => {
   };
   
   const login = async (req, res) => {
+    // console.log(req);
+    
     try {
       const { email, password } = req.body;
   
@@ -105,15 +111,23 @@ const genrentAccRefToken = async (id) => {
         "-password -refretoken"
       );
   
-      const option = {
+      const optionaccrestoken = {
         httpOnly: true,
         secure: true,
+        maxAge:  60 * 60 * 1000,
       };
   
+      const optionrefretoken = {
+        httpOnly: true,
+        secure: true,
+        maxAge:  60 * 60 * 24 * 10 * 1000,
+      };
+  
+
       res
         .status(200)
-        .cookie("accrestoken", accrestoken, option)
-        .cookie("refretoken", refretoken, option)
+        .cookie("accrestoken", accrestoken, optionaccrestoken)
+        .cookie("refretoken", refretoken, optionrefretoken)
         .json({
           success: true,
           message: "Successfully logged in.",
@@ -142,7 +156,7 @@ const genrentAccRefToken = async (id) => {
   
       const user = await Users.findById(checkToken._id);
   
-      console.log(user);
+      // console.log(user);
   
       if (!user) {
         return res.status(400).json({
@@ -210,4 +224,43 @@ const genrentAccRefToken = async (id) => {
     }
   };
 
-module.exports = { logout,register,genrentAccRefToken, login, generateNewToken }
+  const chekhlogin = async (req,res) => {
+   try {
+    
+    console.log("aaaaaaaaa",req.cookies.accrestoken);
+    
+    if (!req.cookies.accrestoken) {
+      return res.status(401).json({
+        success: false,
+        message: "Token Invalied",
+      });
+    }
+
+    const chek = await jwt.verify(req.cookies.accrestoken,"Qwerty123");
+
+    console.log("chek",chek);
+    
+    if (!chek) {
+      return res.status(400).json({
+        success: false,
+        message: "Token Invalied",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "User Authenticated",
+      data: chek
+  })
+   
+    
+   } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Internal server error: " + error.message,
+    });
+    
+   }
+  }
+
+module.exports = { logout,register,genrentAccRefToken, login, generateNewToken,chekhlogin }

@@ -6,7 +6,7 @@ const listcustomers = async (req, res) => {
     try {
       const customers = await getcustomers();
   
-      console.log(customers);
+      // console.log(customers);
     } catch (error) {
       console.log(error);
       res.status(500).json({

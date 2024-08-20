@@ -5,7 +5,7 @@ const listSubcategories = async (req, res) => {
     try {
         const subcategories = await SubCategories.find();
 
-        console.log(subcategories);
+        // console.log(subcategories);
 
         if (!subcategories || subcategories.length === 0) {
             res.status(404).json({
@@ -56,7 +56,7 @@ const listcategories = async (req, res) => {
 
 const addSubcategories =async (req, res) => { 
     try {
-        console.log(req.body);
+        // console.log(req.body);
     
         const newsubCategory = await SubCategories.create(req.body);
         

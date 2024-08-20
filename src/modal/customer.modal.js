@@ -3,7 +3,7 @@ const  pool  = require("../db/Sql");
 const getcustomers = async (req, res) => {
     try {
         const data = await pool.execute("SELECT * FROM customers")
-        console.log(data);
+        // console.log(data);
     } catch (error) {
         console.log(error);
     }

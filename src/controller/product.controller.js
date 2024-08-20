@@ -7,7 +7,7 @@ const listProduct = async (req, res) => {
   try {
     const listProducts = await Products.find();
 
-    console.log(Products);
+    // console.log(Products);
     if (!listProducts || listProducts.length === 0) {
       res.status(404).json({
         success: false,
@@ -31,13 +31,13 @@ const listProduct = async (req, res) => {
 }
 
 const addProduct = async (req, res) => {
-  console.log("adddddd", req.body);
-  console.log(req.file);
+  // console.log("adddddd", req.body);
+  // console.log(req.file);
   try {
 
 
     const fileres = await fileupload(req.file.path, "Productimg");
-    console.log(fileres);
+    // console.log(fileres);
 
     const newproduct = await Products.create({
       ...req.body,
@@ -73,7 +73,7 @@ const updateProduct = async (req, res) => {
     if (req.file) {
       console.log("New File upload");
       const fileres = await fileupload(req.file.path, "Productimg");
-      console.log(fileres);
+      // console.log(fileres);
 
       const updatedproduct = await Products.findByIdAndUpdate(
         req.params.product_id,
@@ -302,7 +302,7 @@ const serachproduct = async (req, res) => {
     }
 
     const data = await Products.aggregate(pipeline);
-    console.log(data);
+    // console.log(data);
   
     res.status(200).json({
       success: true,

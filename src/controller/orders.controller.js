@@ -5,7 +5,7 @@ const listorders = async (req, res) => {
     try {
       const orders = await getorders();
   
-      console.log(orders);
+      // console.log(orders);
     } catch (error) {
       console.log(error);
       res.status(500).json({
