@@ -3,15 +3,15 @@ require('dotenv').config()
 const express = require("express");
 const routes = require("./routes/api/v1/index");
 const connectDB = require("./db/mongodb");
-const cookieParser = require('cookie-parser')
-const passport = require("passport");
-const { facebookProvider, googleProvuder } = require("./utilse/Provider");
-const pdfmake = require("./utilse/pdfcrate");
-const swaggerUi = require('swagger-ui-express');
-const YAML = require('yamljs');
+// const cookieParser = require('cookie-parser')
+// const passport = require("passport");
+// const { facebookProvider, googleProvuder } = require("./utilse/Provider");
+// const pdfmake = require("./utilse/pdfcrate");
+// const swaggerUi = require('swagger-ui-express');
+// const YAML = require('yamljs');
 const cors = require('cors');
 // const connectChat = require("./utilse/Socket");
-const path = require('path');
+// const path = require('path');
 
 const app = express();
 // const swaggerDocument = YAML.load('./src/api.yaml')
@@ -50,14 +50,16 @@ app.use(cors({
 // app.use(passport.session());
 app.use(express.json());
 
+app.use('/',(req,res)=>{
+    res.send("hello world")
+})
+
 app.use("/api/v1", routes);
 
 // app.use(cookieParser())
 // pdfmake();
 
-app.use('/',(req,res)=>{
-    res.send("hello world")
-})
+
 
 
 app.listen(5000, () => {
