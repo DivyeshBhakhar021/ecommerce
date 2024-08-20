@@ -48,7 +48,7 @@ app.use(cors({
 // app.use(require('express-session')({ secret: 'aaa$12', resave: true, saveUninitialized: true }));
 // app.use(passport.initialize());
 // app.use(passport.session());
-// app.use(express.json());
+app.use(express.json());
 
 app.use("/api/v1", routes);
 
